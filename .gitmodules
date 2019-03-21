@@ -1,0 +1,6 @@
+[submodule "server/codebase/docpie"]
+	path = server/codebase/docpie
+	url = https://github.com/TylerTemp/docpie.git
+[submodule "server/codebase/docpie.wiki"]
+	path = server/codebase/docpie.wiki
+	url = https://github.com/TylerTemp/docpie.wiki.git
