@@ -27,7 +27,8 @@ class TryDocpieStorage {
   // @observable extra=null;
 
   @observable submitting=false;
-  @observable error=null;
+  @observable serverError=null;
+  @observable apiError=null;
   @observable result=null;
 
   @action updatePair(key, value) {
@@ -54,24 +55,28 @@ class TryDocpieStorage {
     return new Promise((resolve, reject) => {
       transaction(() => {
         this.submitting = true;
-        this.error = null;
+        this.serverError = null;
+        this.apiError = null;
         this.result = null;
       });
       apiCaller.post('/api/', JSON.stringify(options), {headers: {
         'Content-Type': 'application/json',
-        'Accept': 'text/plain',
-      }}).then(action('docpieApiSucceed', (result) => {
+        'Accept': 'application/json',
+      }}).then(action('docpieApiSucceed', (responseBody) => {
+          const {ok, result} = JSON.parse(responseBody);
           transaction(() => {
             this.submitting = false;
-            this.error = null;
-            this.result = result
+            this.serverError = null;
+            this.apiError = ok;
+            this.result = result;
           });
           resolve(result);
         }), action('docpieApiFailed', (error) => {
           const { message } = error;
           transaction(() => {
             this.submitting = false;
-            this.error = message;
+            this.serverError = message;
+            this.apiError = null;
             this.result = null;
           });
           reject(error);

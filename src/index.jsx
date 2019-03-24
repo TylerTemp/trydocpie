@@ -4,21 +4,16 @@ import {
   BrowserRouter as Router,
   Route,
   Switch,
-  NavLink,
+  // NavLink,
 } from 'react-router-dom';
 
+// import 'purecss/build/pure.css';
+
+import Layout from '~/component/Layout';
 import Home from '~/page/Home';
-import TryDocpie from '~/page/TryDocpie';
+import TryDocpie from '~/page/try_docpie/TryDocpie';
 import NotFound from '~/page/NotFound';
 
-const Layout = ({children}) => (
-  <div>
-    [<NavLink to="/">Home</NavLink>]
-    [<NavLink to="/doc">Document</NavLink>]
-    [<NavLink to="/try">Try Online</NavLink>]
-    {children}
-  </div>
-)
 
 const App = () => (
   <Fragment>
@@ -33,6 +28,7 @@ const App = () => (
     </Router>
   </Fragment>
 );
+
 
 ReactDom.render(
   <App />,

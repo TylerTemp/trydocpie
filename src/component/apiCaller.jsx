@@ -40,8 +40,8 @@ class ApiCaller {
             console.log(error.response);
           }
           if (jsonResp) {
-            if (jsonResp._message !== undefined) {
-              errorMsg = jsonResp._message;
+            if (jsonResp.message !== undefined) {
+              errorMsg = jsonResp.message;
             } else {
               errorMsg = data;
             }

@@ -1,0 +1,158 @@
+.spacing-container {
+  width: 100%;
+  padding: 20px;
+}
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.monospace {
+  font-family: Monaco,Menlo,Consolas,"Courier New",FontAwesome,monospace;
+}
+
+.editor {
+  background-color: #3E4349;
+  color:#fff;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.comment {
+  color: #999999;
+}
+
+.string {
+  color: #66FF66;
+}
+
+.funckey {
+  color: #f8fba5;
+}
+
+.bool {
+  color: #89f689;
+}
+
+.doc {
+  background-color: #3E4349;
+  color:#66FF66;
+  font-weight: bold;
+  display: block;
+  width: 100%;
+  border: none;
+}
+
+.doc:focus {
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  /* border: 1px solid rgba(81, 203, 238, 0.59); */
+}
+
+.keyword {
+  color: #CC00FF;
+  font-weight: bold;
+}
+
+.magic {
+  color: #E06697;
+  font-weight: bold;
+}
+
+.terminal-container {
+  background-color: #610B4B;
+  color: #fff;
+  padding: 5px;
+  padding: 10px;
+  margin-top: 10px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  /* align-items: baseline; */
+  align-items: flex-start;
+}
+
+.terminal-input {
+  background-color: #610B4B;
+  color: #fff;
+  border: none;
+  flex-grow: 1;
+  font-weight: bold;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.terminal-input:focus {
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  /* border: 1px solid rgba(81, 203, 238, 0.59); */
+}
+
+.terminal-enter {
+  padding: 0 2px 0 2px;
+  margin: 0;
+  background: transparent;
+  color: white;
+  border: none;
+  font-weight: bolder;
+  /* box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.59); */
+}
+
+.exec-prefix {
+  white-space: nowrap;
+}
+
+.dollar {
+  color: #F3F781;
+}
+
+.api-result {
+  /* font-weight: bolder; */
+}
+
+.api-api-error {
+  color: yellow;
+}
+
+.server-error-wapper {
+  /* box-shadow: 0 0 5px rgb(238, 81, 81); */
+}
+
+.server-error {
+  /* padding: 0 10px 0 10px; */
+  margin-bottom: 1em;
+  /* padding: .625em; */
+  background: #0e90d2;
+  /* background-color: rgb(14, 144, 210); */
+  color: #fff;
+  border: 1px solid #0c7cb5;
+  border-top-color: rgb(12, 124, 181);
+  border-right-color: rgb(12, 124, 181);
+  border-bottom-color: rgb(12, 124, 181);
+  border-left-color: rgb(12, 124, 181);
+  border-radius: 0;
+
+  background-color: #dd514c;
+  border-color: #d83832;
+  color: #fff;
+  margin-top: 1em;
+}
+
+.option-label {
+  display: inline-block;
+  width: 30vw;
+}
+
+.option-value-container {
+  display: inline;
+  width: 70vw;
+}
+
+.option-deleted {
+  text-decoration: line-through;
+}

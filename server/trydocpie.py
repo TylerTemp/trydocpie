@@ -59,24 +59,19 @@ class StdoutRedirect(StringIO):
 def trydocpie(doc, argv, *a, **k):
 
     with StdoutRedirect() as stdout:
-        ok = True
+        error = False
         try:
             pie = docpie.docpie(doc, argv, *a, **k)
         except (docpie.DocpieExit, SystemExit) as e:
-            ok = True
+            error = True
             output = str(e)
-        except BaseException as e:
-            # in pypy3, sys.exit() gives e.args[0] = None
-            logger.warning(e, exc_info=True)
-            ok = False
-            output = '{}: {}'.format(e.__class__.__name__, (e.args[0] if e.args else '') or '')
         else:
             output = str(pie)
 
         if not output.strip():
             output = stdout.getvalue()
 
-    return ok, output
+    return error, output
 
 
 @app.route('/', methods=('POST',))
@@ -86,9 +81,27 @@ def trydocpiehandler():
     argvstr = args.pop('argvnofilestr')
     argv = shlex.split('pie.py ' + argvstr)
     args['argv'] = argv
-    ok, output = trydocpie(**args)
-    code = 200 if ok else 500
-    return flask.Response(output, status=code, mimetype='text/plain')
+    unexpected_error = False
+    try:
+        expected_error, output = trydocpie(**args)
+    except BaseException as e:
+        logger.error(e, exc_info=True)
+        unexpected_error = True
+        output = '{}: {}'.format(e.__class__.__name__, (e.args[0] if e.args else '') or '')
+
+    if unexpected_error:
+        code = 500
+        resp = {
+            'message': output
+        }
+    else:
+        code = 200
+        resp = {
+            'ok': (not expected_error),
+            'result': output
+        }
+
+    return flask.Response(json.dumps(resp), status=code, mimetype='application/json')
 
 
 @app.route('/', methods=('GET',))
