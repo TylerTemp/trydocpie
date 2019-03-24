@@ -5,7 +5,8 @@ import {
 
 import CenterWidthLimit from '~/component/center_width_limit/CenterWidthLimit';
 
-class Home extends Component {
+
+class Document extends Component {
 
   componentDidMount() {
     this.timer = setTimeout(() => {
@@ -28,4 +29,4 @@ class Home extends Component {
 }
 
 
-export default Home;
+export default Document;

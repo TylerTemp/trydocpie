@@ -146,6 +146,7 @@
 .option-label {
   display: inline-block;
   width: 30vw;
+  border-bottom: 1px dashed #bdbcbc;
 }
 
 .option-value-container {

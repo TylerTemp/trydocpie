@@ -9,8 +9,9 @@ import {
 
 // import 'purecss/build/pure.css';
 
-import Layout from '~/component/Layout';
+import Layout from '~/component/layout/Layout';
 import Home from '~/page/Home';
+import Document from '~/page/Document';
 import TryDocpie from '~/page/try_docpie/TryDocpie';
 import NotFound from '~/page/NotFound';
 
@@ -21,6 +22,7 @@ const App = () => (
       <Layout>
         <Switch>
           <Route path="/" exact component={Home} />
+          <Route path="/document" exact component={Document} />
           <Route path="/try" exact component={TryDocpie} />
           <Route component={NotFound} />
         </Switch>
