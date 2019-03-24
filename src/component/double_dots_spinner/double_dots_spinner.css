@@ -15,7 +15,7 @@
   display: inline-block;
   position: absolute;
   top: 0;
-  background-color: white;
+  /* background-color: white; */
   border-radius: 100%;
 
   -webkit-animation: sk-bounce 2.0s infinite ease-in-out;

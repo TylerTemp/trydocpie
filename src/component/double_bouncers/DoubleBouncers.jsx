@@ -3,9 +3,9 @@ import DoubleBouncersStyle from './double_bouncers.css';
 
 
 const DoubleBouncers = () => (
-  <div class={DoubleBouncersStyle.spinner}>
-    <div class={DoubleBouncersStyle['double-bounce1']}></div>
-    <div class={DoubleBouncersStyle['double-bounce2']}></div>
+  <div className={DoubleBouncersStyle.spinner}>
+    <div className={DoubleBouncersStyle['double-bounce1']}></div>
+    <div className={DoubleBouncersStyle['double-bounce2']}></div>
   </div>
 );
 

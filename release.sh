@@ -1,3 +1,5 @@
 yarn build
-ssh "$1" 'mkdir -p release/trydocpie'
-scp -r build/* "$1:release/trydocpie"
+ssh "docpie.comes.today" 'mkdir -p release/trydocpieclient'
+ssh "docpie.comes.today" 'mkdir -p release/trydocpieserver'
+rsync --progress build/* "docpie.comes.today:release/trydocpieclient"
+rsync --progress server/* "docpie.comes.today:release/trydocpieserver"

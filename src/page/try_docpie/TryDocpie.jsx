@@ -4,12 +4,14 @@ import {
   observer
 } from 'mobx-react';
 import classNames from 'classnames';
+import queryString from 'query-string';
 
 import CenterWidthLimit from '~/component/center_width_limit/CenterWidthLimit';
-// import DoubleDotsSpinner from '~/component/double_dots_spinner/DoubleDotsSpinner';
+import DoubleDotsSpinner from '~/component/double_dots_spinner/DoubleDotsSpinner';
 import DoubleBouncers from '~/component/double_bouncers/DoubleBouncers';
 
 import tryDocpieStorage from '~/storage/tryDocpieStorage';
+import docpieInfoStorage from '~/storage/docpieInfoStorage';
 
 import tryDocpieStyle from './try_docpie.css';
 
@@ -17,22 +19,199 @@ import tryDocpieStyle from './try_docpie.css';
 @observer
 class TryDocpie extends Component {
 
+  constructor(props) {
+    super(props);
+    this.parseArgs = this.parseArgs.bind(this);
+    this.handleSumbit = this.handleSumbit.bind(this);
+    this.fitDocHeight = this.fitDocHeight.bind(this);
+    this.docRef = React.createRef();
+  }
+
+  componentDidMount() {
+    if(docpieInfoStorage.error !== null) {
+      docpieInfoStorage.fetch();
+    }
+    let params = this.parseArgs();
+    const {run} = params;
+    delete params['run'];
+    tryDocpieStorage.bulkUpdate(params);
+    // this.fitDocHeight();
+    // TODO: better way?
+    setTimeout(this.fitDocHeight, 0);
+    // console.log(run);
+    if(run) {
+      tryDocpieStorage.submit();
+    }
+  }
+
+  fitDocHeight() {
+    let element = this.docRef.current;
+    element.style.height = 'auto';
+    element.style['overflow-y'] = 'hidden';
+    element.style.height = (element.scrollHeight) + 'px';
+  }
+
+  jqueryBoolStyleToBool(value) {
+    switch(value) {
+      case 'on':
+        return true;
+        break;
+      case 'off':
+        return false;
+        break;
+      case undefined:
+        return false;
+        break;
+      default:
+        throw Error(`Unrecongnized value ${value}`);
+    }
+  }
+
+  jqueryStringStyleToNull(value) {
+    switch(value) {
+      case '':
+        return null;
+        break;
+      case undefined:
+        return null;
+        break;
+      default:
+        return value;
+    }
+  }
+
+  parseArgs() {
+    const {props: {location: {search}}} = this;
+    if(search === '') {
+      return {};
+    }
+    let params = queryString.parse(search);
+    const {
+      doc: docOld,
+      argvnofilestr: argvNew,
+      argv: argvOld,
+      help: helpOld,
+      version: versionOld,
+      stdopt: stdoptOld,
+      attachopt: attachoptOld,
+      attachvalue: attachvalueOld,
+      helpstyle: helpstyleOld,
+      auto2dashes: auto2dashesOld,
+      name: nameOld,
+      optionsfirst: optionsfirstOld,
+      appearedonly: appearedonlyOld,
+      replace,
+      run
+    } = params;
+    let doc = docOld;
+    if(this.jqueryBoolStyleToBool(replace)) {
+      doc = docOld.replace('\\n', '\n');
+    }
+
+    return {
+      doc: doc,
+      argvnofilestr: argvNew || argvOld || '',
+      help: this.jqueryBoolStyleToBool(helpOld),
+      version: this.jqueryStringStyleToNull(versionOld),
+      stdopt: this.jqueryBoolStyleToBool(stdoptOld),
+      attachopt: this.jqueryBoolStyleToBool(attachoptOld),
+      attachvalue: this.jqueryBoolStyleToBool(attachvalueOld),
+      helpstyle: this.jqueryStringStyleToNull(helpstyleOld) || 'python',
+      auto2dashes: this.jqueryBoolStyleToBool(auto2dashesOld),
+      name: this.jqueryStringStyleToNull(nameOld),
+      optionsfirst: this.jqueryBoolStyleToBool(optionsfirstOld),
+      appearedonly: this.jqueryBoolStyleToBool(appearedonlyOld),
+      run: this.jqueryBoolStyleToBool(run),
+    }
+  }
+
+  handleSumbit(event) {
+    event.preventDefault();
+    tryDocpieStorage.submit();
+    const {props: {location: {pathname}}} = this;
+    const keys = [
+      'doc', 'argvnofilestr', 'help', 'version', 'stdopt', 'attachopt', 'attachvalue', 'helpstyle', 'auto2dashes', 'name', 'optionsfirst', 'appearedonly', 'namedoptions',
+    ];
+
+    const params = keys.reduce((accumulator, key) => {
+      // console.log('accumulator', accumulator);
+      let value = tryDocpieStorage[key];
+      switch(key) {
+        case 'helpstyle':
+          value = (value === 'python'? undefined: value);
+          break;
+        case 'doc':
+          value = value.replace('\n', '\\n');
+          break;
+        case 'name':
+        case 'version':
+          value = (value === ''? undefined: value);
+          break;
+        default:
+          ;
+      }
+
+      switch(value) {
+        case null:
+        case false:
+        case '':
+          value = undefined;
+          break;
+        case true:
+          value = 'on';
+        default:
+          ;
+      }
+
+      accumulator[key] = value;
+      return accumulator;
+    }, {'replace': 'on'});
+
+    console.log(params);
+
+    this.props.history.push({
+      pathname,
+      search: `?${queryString.stringify(params)}`
+    });
+  }
+
   render() {
+
+    // console.log(this.props);
+    // console.log(this.parseArgs());
 
     const {doc, argvnofilestr, help, version, stdopt, attachopt, attachvalue, helpstyle, auto2dashes, name, optionsfirst, appearedonly, namedoptions, submitting, serverError, apiError, result} = tryDocpieStorage;
 
+    const {
+      versionTimeReadable: docpieInfoVersionTimeReadable,
+      version: docpieInfoVersion,
+      submitting: docpieInfoSubmitting,
+      error: docpieInfoError
+    } = docpieInfoStorage;
+
     return <CenterWidthLimit>
       <div className={tryDocpieStyle.container}>
-        <form onSubmit={ (evt) => {evt.preventDefault(); tryDocpieStorage.submit()} }>
+        <div>
+          {(() => {
+            if(docpieInfoError) {
+              return <p>failed to fetch version({docpieInfoError})<button onClick={(event) => {event.preventDefault(); docpieInfoStorage.fetch()}}>retry</button></p>;
+            }
+            if(docpieInfoSubmitting) {
+              return <DoubleDotsSpinner color="#a19f9f"/>;
+            }
+            return <p>docpie {docpieInfoVersion}, updated at {docpieInfoVersionTimeReadable}</p>;
+          })()}
+        </div>
+        <form onSubmit={this.handleSumbit}>
           <div className={classNames(tryDocpieStyle.editor, tryDocpieStyle.monospace)}>
             <span className={tryDocpieStyle.comment}>#!/usr/bin/env python</span>
             <br />
             <span className={tryDocpieStyle.comment}># -*- coding: utf-8 -*-</span>
             <br />
-            <span className={tryDocpieStyle.comment}># </span>
+            <span className={tryDocpieStyle.comment}># {name || `pie.py`}</span>
             <br />
             <span className={tryDocpieStyle.string}>"""</span>
-            <textarea className={tryDocpieStyle.doc} name="doc" placeholder="Input your doc string" required onChange={({target: {name, value}}) => (tryDocpieStorage.updatePair(name, value))}></textarea>
+            <textarea className={tryDocpieStyle.doc} ref={this.docRef} name="doc" value={doc} placeholder="Input your doc string" required onChange={({target: {name, value}}) => {tryDocpieStorage.updatePair(name, value); this.fitDocHeight(); }}></textarea>
             <span className={tryDocpieStyle.string}>"""</span>
             <br />
             <span className={tryDocpieStyle.keyword}>from</span>
@@ -78,7 +257,7 @@ class TryDocpie extends Component {
                 {' '}
                 python
                 {' '}
-                <span>pie.py</span>
+                <span>{name || `pie.py`}</span>
                 {' '}
               </label>
               <input className={tryDocpieStyle['terminal-input']} type="text" id="argvnofilestr" value={argvnofilestr} name="argvnofilestr" placeholder="# Input your argv" onChange={({target: {name, value}}) => (tryDocpieStorage.updatePair(name, value))} />

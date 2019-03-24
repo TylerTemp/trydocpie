@@ -42,6 +42,8 @@
   display: block;
   width: 100%;
   border: none;
+  height: auto;
+  overflow-y: hidden;
 }
 
 .doc:focus {
@@ -113,6 +115,7 @@
 
 .api-result {
   /* font-weight: bolder; */
+  white-space: pre;
 }
 
 .api-api-error {
