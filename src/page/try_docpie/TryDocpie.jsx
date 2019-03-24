@@ -105,7 +105,7 @@ class TryDocpie extends Component {
     } = params;
     let doc = docOld;
     if(this.jqueryBoolStyleToBool(replace)) {
-      doc = docOld.replace('\\n', '\n');
+      doc = docOld.split('\\n').join('\n');
     }
 
     return {
@@ -141,7 +141,7 @@ class TryDocpie extends Component {
           value = (value === 'python'? undefined: value);
           break;
         case 'doc':
-          value = value.replace('\n', '\\n');
+          value = value.split('\n').join('\\n');
           break;
         case 'name':
         case 'version':
@@ -226,7 +226,7 @@ class TryDocpie extends Component {
             args = docpie(<span className={tryDocpieStyle.magic}>__doc__</span>{
               help || <Fragment>, <span className={tryDocpieStyle.funckey}>help</span>=<span className={tryDocpieStyle.bool}>False</span></Fragment>
             }{
-              version === null? null: <Fragment>, <span className={tryDocpieStyle.funckey}>version</span>=<span className={tryDocpieStyle.string}>'{version.replace('\\', '\\\\').replace("'", "\\'")}'</span></Fragment>
+              version === null? null: <Fragment>, <span className={tryDocpieStyle.funckey}>version</span>=<span className={tryDocpieStyle.string}>'{version.split('\\').join('\\\\').split("'").join("\\'")}'</span></Fragment>
             }{
               stdopt || <Fragment>, <span className={tryDocpieStyle.funckey}>stdopt</span>=<span className={tryDocpieStyle.bool}>False</span></Fragment>
             }{
@@ -238,7 +238,7 @@ class TryDocpie extends Component {
             }{
               auto2dashes || <Fragment>, <span className={tryDocpieStyle.funckey}>auto2dashes</span>=<span className={tryDocpieStyle.bool}>False</span></Fragment>
             }{
-              name === null || <Fragment>, <span className={tryDocpieStyle.funckey}>name</span>=<span className={tryDocpieStyle.string}>'{name.replace('\\', '\\\\').replace("'", "\\'")}'</span></Fragment>
+              name === null || <Fragment>, <span className={tryDocpieStyle.funckey}>name</span>=<span className={tryDocpieStyle.string}>'{name.split('\\').join('\\\\').split("'").join("\\'")}'</span></Fragment>
             }{
               optionsfirst && <Fragment>, <span className={tryDocpieStyle.funckey}>optionsfirst</span>=<span className={tryDocpieStyle.bool}>True</span></Fragment>
             }{

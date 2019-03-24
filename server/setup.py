@@ -2,7 +2,7 @@
 from setuptools import setup
 import os
 
-from trydocpie import __version__
+__version__ = '0.0.1'
 
 setup(
     name="trydocpiedocpie",
