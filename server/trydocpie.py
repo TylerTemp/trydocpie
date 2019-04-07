@@ -166,6 +166,8 @@ def gen_folder(folder):
                 content = f.read()
 
             if filetype == 'md':
+                if filebase == 'Usage-Format':
+                    content = content.replace('\\<argument\\>', '&lt;argument&gt;')
                 # html = markdown.markdown(content, extensions=[
                 #     'markdown.extensions.fenced_code',
                 #     'markdown.extensions.footnotes',
