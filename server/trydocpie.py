@@ -27,8 +27,8 @@ except ImportError:
     from urlparse import urlparse, urlunparse
 
 import flask
-# import markdown
-import markdown2
+import markdown
+# import markdown2
 from docutils import core
 from docutils.writers.html4css1 import Writer,HTMLTranslator
 from bs4 import BeautifulSoup
@@ -167,18 +167,21 @@ def gen_folder(folder):
 
             if filetype == 'md':
                 if filebase == 'Usage-Format':
-                    content = content.replace('\\<argument\\>', '&lt;argument&gt;')
-                # html = markdown.markdown(content, extensions=[
-                #     'markdown.extensions.fenced_code',
-                #     'markdown.extensions.footnotes',
-                #     'markdown.extensions.codehilite',
-                #     'markdown.extensions.toc',
-                # ])
-                html = markdown2.markdown(content, extras=[
-                    'toc',
-                    'fenced-code-blocks',
-                    'footnotes',
+                    # content = content.replace('\\<argument\\>', '&lt;argument&gt;')
+                    content_body = content.split('\n\n', 1)[1].replace('\\<argument\\>', '&lt;argument&gt;')
+                    content = '[TOC]\n\n' + content_body
+
+                html = markdown.markdown(content, extensions=[
+                    'markdown.extensions.fenced_code',
+                    'markdown.extensions.footnotes',
+                    'markdown.extensions.codehilite',
+                    'markdown.extensions.toc',
                 ])
+                # html = markdown2.markdown(content, extras=[
+                #     'toc',
+                #     'fenced-code-blocks',
+                #     'footnotes',
+                # ])
             elif filetype == 'rst':
                 html_fragment_writer = Writer()
                 html_fragment_writer.translator_class = HTMLFragmentTranslator
