@@ -1,7 +1,7 @@
 import React, { Fragment, Component } from 'react';
 import {
   Link,
-  NavLink
+  // NavLink
 } from 'react-router-dom';
 
 import {
@@ -15,10 +15,10 @@ import Suspenser from '~/component/Suspenser';
 import apiCaller from '~/component/apiCaller';
 import CenterWidthLimit from '~/component/center_width_limit/CenterWidthLimit';
 import documentStyle from './document.css';
+import Menu from './Menu';
 
 
-const parseHTML = (html, linkType) => {
-  const LinkNode = linkType === undefined? Link: NavLink;
+const parseHTML = (html) => {
   return new ReactHtmlParser(html, {
       transform: (node, index) => {
         const {type: nodeType, name: nodeName} = node;
@@ -26,9 +26,9 @@ const parseHTML = (html, linkType) => {
           const {attribs, children} = node;
           const {href} = attribs;
           if(href.startsWith('/')) {
-            return <LinkNode key={index} to={href} className={documentStyle['menu-link']} activeClassName={documentStyle['menu-link-active']}>
+            return <Link key={index} to={href} className={documentStyle['menu-link']}>
               {children.map(({data}) => data)}
-            </LinkNode>;
+            </Link>;
           } else if(href.startsWith('#')) {
           } else {
             return <a key={index} target='_blank' {...attribs}>{children.map(({data}) => data)}</a>;
@@ -38,15 +38,6 @@ const parseHTML = (html, linkType) => {
     }
   );
 };
-
-
-const menuResource = createResource(() => apiCaller.get(`/static/docpie-wiki/_Sidebar.html`));
-
-
-const Menu = () => {
-  const content = menuResource.read();
-  return parseHTML(content, NavLink);
-}
 
 
 const pageResource = createResource(pageId => apiCaller.get(`/static/docpie-wiki/${pageId}.html`));
@@ -63,19 +54,7 @@ const Document = ({match: {params: {id='Home'}}}) => {
     <CenterWidthLimit>
       <h2 className={documentStyle.title}>{title}</h2>
       <hr />
-      <div className={documentStyle['menu-wrapper']}>
-        <div className={documentStyle.menu}>
-          <div className={documentStyle['menu-title']}>
-            <h6 className={documentStyle['menu-title-content']}>Table of Content</h6>
-            <hr className={documentStyle['menu-title-sep']} />
-          </div>
-          <div  className={documentStyle['menu-body']}>
-            <Suspenser fallback={<DoubleBouncers color="#00000042" />}>
-              <Menu />
-            </Suspenser>
-          </div>
-        </div>
-      </div>
+      <Menu />
       <Suspenser fallback={<DoubleBouncers color="#00000042" />}>
         <Page page={id} />
       </Suspenser>

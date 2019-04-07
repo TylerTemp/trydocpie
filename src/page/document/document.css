@@ -25,11 +25,12 @@
 
 .menu-title {
   text-align: center;
+  cursor: pointer;
 }
 
 .menu-title-content {
   padding: 0;
-  margin: 10px 0 10px 0;
+  margin: 10px;
   font-size: 1.3rem;
 }
 
@@ -47,4 +48,13 @@
 
 .menu-link.menu-link-active {
   border-bottom: 1px dashed #bdbcbc;
+}
+
+.menu-footer {
+  text-align: center;
+  cursor: pointer;
+}
+
+.grey {
+  color: grey;
 }
