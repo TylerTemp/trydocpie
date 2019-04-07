@@ -10,8 +10,8 @@ import {
 // import 'purecss/build/pure.css';
 
 import Layout from '~/component/layout/Layout';
-import Home from '~/page/Home';
-import Document from '~/page/Document';
+import Home from '~/page/home/Home';
+import Document from '~/page/document/Document';
 import TryDocpie from '~/page/try_docpie/TryDocpie';
 import NotFound from '~/page/NotFound';
 

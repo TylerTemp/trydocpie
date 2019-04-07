@@ -8,6 +8,7 @@
   margin-bottom: 1rem;
   border-width: 0 0 1px;
   border-style: solid;
+  z-index: 100;
 }
 
 .nav {

@@ -191,6 +191,8 @@ class TryDocpie extends Component {
 
     return <CenterWidthLimit>
       <div className={tryDocpieStyle.container}>
+        <h2 className={tryDocpieStyle.title}>Try docpie</h2>
+        <hr />
         <div>
           {(() => {
             if(docpieInfoError) {

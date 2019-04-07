@@ -21,11 +21,17 @@ except ImportError:
         from cStringIO import StringIO
     except ImportError:
         from StringIO import StringIO
+try:
+    from urllib.parse import urlparse, urlunparse
+except ImportError:
+    from urlparse import urlparse, urlunparse
 
 import flask
+# import markdown
 import markdown2
 from docutils import core
 from docutils.writers.html4css1 import Writer,HTMLTranslator
+from bs4 import BeautifulSoup
 import docpie
 
 
@@ -160,18 +166,46 @@ def gen_folder(folder):
                 content = f.read()
 
             if filetype == 'md':
-                html = markdown2.markdown(content)
+                # html = markdown.markdown(content, extensions=[
+                #     'markdown.extensions.fenced_code',
+                #     'markdown.extensions.footnotes',
+                #     'markdown.extensions.codehilite',
+                #     'markdown.extensions.toc',
+                # ])
+                html = markdown2.markdown(content, extras=[
+                    'toc',
+                    'fenced-code-blocks',
+                    'footnotes',
+                ])
             elif filetype == 'rst':
                 html_fragment_writer = Writer()
                 html_fragment_writer.translator_class = HTMLFragmentTranslator
                 html = core.publish_string(content, writer=html_fragment_writer).decode('utf-8')
             if filebase in ('Home', '_Sidebar'):
-                html = re.sub('\\[\\[(.*?)\\]\\]', lambda matchobj: '<a href="{link}.html">{linkname}</a>'.format(link=matchobj.group(1).replace(' ', '-'), linkname=matchobj.group(1)), html)
+                html = re.sub('\\[\\[(.*?)\\]\\]', lambda matchobj: '<a href="/document/{link}">{linkname}</a>'.format(link=matchobj.group(1).replace(' ', '-'), linkname=matchobj.group(1)), html)
+
+            soup = BeautifulSoup(html, 'html5lib')
+            for link in soup.find_all('a'):
+                href = link.get('href')
+                if href and (href.startswith('http://') or href.startswith('https://')):
+                    url_obj = urlparse(href)
+                    if url_obj.hostname in ('docpie.comes.today', 'docpie.notexists.top'):
+                        url = urlunparse(('', '', url_obj.path, url_obj.params, url_obj.query, url_obj.fragment))
+                        link['href'] = url
+
+            for pre in soup.find_all('pre'):
+                inner_pre = pre.decode_contents()
+                pre_class = pre.get('class') or []
+                inner_break = inner_pre.replace('\n', '<br />')
+                pre_soup = BeautifulSoup('<pre class="{classes}">{content}</pre>'.format(classes=' '.join(pre_class), content=inner_break), 'html5lib')
+                pre.replace_with(pre_soup.find('pre'))
+
+            body = soup.body.decode_contents()
 
             target_filename = filebase + '.html'
             logger.info('saving %s', target_filename)
             with open(os.path.join(target_folder, target_filename), 'w', encoding='utf-8') as t:
-                t.write(html)
+                t.write(body)
 
 
 if __name__ == '__main__':

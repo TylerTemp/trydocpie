@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
-// const CopyPlugin = require('copy-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 // const CleanWebpackPlugin = require('clean-webpack-plugin');
 
@@ -44,10 +44,11 @@ module.exports = {
     new WebpackShellPlugin({
       onBuildStart:[],
       onBuildEnd:['python -m trydocpie gen build/static']
-    })
-    // new CopyPlugin([
-    //   { from: 'public/splash.png', to: 'splash.png' },
-    // ]),
+    }),
+    new CopyPlugin([
+      { from: 'public/code-highlight.css', to: 'code-highlight.css' },
+      { from: 'public/normalize.css', to: 'normalize.css' },
+    ]),
   ],
   devServer: {
     contentBase: path.resolve(__dirname, 'build'),

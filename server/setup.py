@@ -22,8 +22,11 @@ setup(
     install_requires=[
         'flask',
         'docpie',
-        'markdown2',
+        'markdown',
         'docutils',
+        'bs4',
+        'html5lib',
+        'pygments',
     ],
     author="TylerTemp",
     author_email="tylertempdev@gmail.com",
