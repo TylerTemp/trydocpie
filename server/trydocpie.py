@@ -11,6 +11,8 @@ import logging
 import json
 import shlex
 import sys
+import os
+import re
 # import inspect
 try:
     from io import StringIO
@@ -21,14 +23,15 @@ except ImportError:
         from StringIO import StringIO
 
 import flask
+import markdown2
+from docutils import core
+from docutils.writers.html4css1 import Writer,HTMLTranslator
 import docpie
 
 
-__version__ = '0.0.1'
 logging.getLogger('docpie').setLevel(logging.CRITICAL)
 
 logger = logging.getLogger('trydocpie')
-logger.setLevel(logging.DEBUG)
 
 
 app = flask.Flask(__name__)
@@ -113,12 +116,68 @@ def trydocpieinfohandler():
     return flask.Response(json.dumps(info), mimetype='application/json')
 
 
+class HTMLFragmentTranslator( HTMLTranslator ):
+    def __init__( self, document ):
+        HTMLTranslator.__init__( self, document )
+        self.head_prefix = ['','','','','']
+        self.body_prefix = []
+        self.body_suffix = []
+        self.stylesheet = []
+    def astext(self):
+        return ''.join(self.body)
+
+
 def gen_folder(folder):
-    pass
+    project_root = os.path.normpath(os.path.join(__file__, '..', '..'))
+    codebase = os.path.join(project_root, 'server', 'codebase')
+    configs = (
+        {
+            'source': os.path.join(codebase, 'docpie'),
+            'target': os.path.join(project_root, 'build', 'static', 'docpie'),
+        },
+        {
+            'source': os.path.join(codebase, 'docpie.wiki'),
+            'target': os.path.join(project_root, 'build', 'static', 'docpie-wiki'),
+        },
+    )
+    for config in configs:
+        source_folder = config['source']
+        target_folder = config['target']
+        if not os.path.isdir(target_folder):
+            os.makedirs(target_folder)
+
+        _dirpath, _dirnames, filenames = next(os.walk(source_folder))
+        for filename in filenames:
+            filebase, fileext = os.path.splitext(filename)
+            fileext_lower = fileext.lower()
+            if fileext_lower == '.md':
+                filetype = 'md'
+            elif fileext_lower == '.rst':
+                filetype = 'rst'
+            else:
+                continue
+            with open(os.path.join(source_folder, filename), 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            if filetype == 'md':
+                html = markdown2.markdown(content)
+            elif filetype == 'rst':
+                html_fragment_writer = Writer()
+                html_fragment_writer.translator_class = HTMLFragmentTranslator
+                html = core.publish_string(content, writer=html_fragment_writer).decode('utf-8')
+            if filebase in ('Home', '_Sidebar'):
+                html = re.sub('\\[\\[(.*?)\\]\\]', lambda matchobj: '<a href="{link}.html">{linkname}</a>'.format(link=matchobj.group(1).replace(' ', '-'), linkname=matchobj.group(1)), html)
+
+            target_filename = filebase + '.html'
+            logger.info('saving %s', target_filename)
+            with open(os.path.join(target_folder, target_filename), 'w', encoding='utf-8') as t:
+                t.write(html)
+
 
 if __name__ == '__main__':
-
     args = docpie.docpie(__doc__)
+    logging.basicConfig()
+    logger.setLevel(logging.DEBUG)
     if args['web']:
         args_port = args['<port>']
         port = int(args_port) if args_port is not None else 8080

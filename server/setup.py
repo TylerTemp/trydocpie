@@ -2,10 +2,10 @@
 from setuptools import setup
 import os
 
-__version__ = '0.0.1'
+from version import VERSION as __version__
 
 setup(
-    name="trydocpiedocpie",
+    name="trydocpie",
     # packages=["trydocpiedocpie"],
     # package_data={
     #     '': [
@@ -22,6 +22,8 @@ setup(
     install_requires=[
         'flask',
         'docpie',
+        'markdown2',
+        'docutils',
     ],
     author="TylerTemp",
     author_email="tylertempdev@gmail.com",

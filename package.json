@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack --progress --colors --mode=production & webpack-dev-server --progress --colors --mode=development --inline --port 8081",
-    "build": "webpack --progress --colors --mode=production"
+    "build": "webpack --progress --colors --mode=production",
+    "serverinit": "cd server && pip install -U -e .; cd ..; python -m trydocpie gen build/static",
+    "server": "python -m trydocpie web"
   },
   "keywords": [
     "docpie",
@@ -14,23 +16,20 @@
   ],
   "author": "TylerTemp",
   "devDependencies": {
-    "babel": "^6.23.0",
-    "babel-cli": "^6.26.0",
+    "@babel/core": "^7.4.3",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/plugin-proposal-decorators": "^7.4.0",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
-    "babel-loader": "^7.1.5",
+    "babel-loader": "^8.0.5",
     "babel-plugin-root-import": "^6.1.0",
-    "babel-plugin-transform-decorators-legacy": "^1.3.5",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
-    "babel-register": "^6.26.0",
     "clean-webpack-plugin": "^2.0.0",
     "css-loader": "^1.0.0",
-    "eslint": "^5.14.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-loader": "^2.1.0",
+    "eslint-loader": "^2.1.2",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.10.0",
@@ -42,7 +41,8 @@
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5",
-    "webpack-manifest-plugin": "^2.0.4"
+    "webpack-manifest-plugin": "^2.0.4",
+    "webpack-shell-plugin": "^0.5.0"
   },
   "dependencies": {
     "axios": "^0.18.0",

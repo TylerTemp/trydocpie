@@ -1,11 +1,13 @@
 *.py[o|c]
 __pycache__
 *.egg-info
+*.log
 
 /node_modules
 /build
 
 .*
 !.gitignore
+!.gitmodules
 !.eslintrc.js
 !.babelrc

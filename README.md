@@ -4,6 +4,7 @@
 
 ```bash
 yarn install
+yarn serverinstall
 ```
 
 *   start: `yarn start`

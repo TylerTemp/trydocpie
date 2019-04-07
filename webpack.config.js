@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const WebpackShellPlugin = require('webpack-shell-plugin');
 // const CopyPlugin = require('copy-webpack-plugin');
 
 // const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -40,6 +41,10 @@ module.exports = {
       dry: false,
     }),
     new ManifestPlugin(),
+    new WebpackShellPlugin({
+      onBuildStart:[],
+      onBuildEnd:['python -m trydocpie gen build/static']
+    })
     // new CopyPlugin([
     //   { from: 'public/splash.png', to: 'splash.png' },
     // ]),
@@ -67,9 +72,14 @@ module.exports = {
         loader: 'babel-loader',
         query: {
           cacheDirectory: true,
-          plugins: ['transform-decorators-legacy'],
-          presets: ['es2015', 'stage-0', 'react'],
+          // plugins: ['transform-decorators-legacy'],
+          // presets: ['es2015', 'stage-0', 'react'],
         },
+      },
+      {
+        test: /\.jsx$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader',
       },
       {
         test: /\.js$/,

@@ -3,6 +3,7 @@
   border-color: #0b6fa2;
   color: #eee;
   position: sticky;
+  top: 0;
   min-height: 50px;
   margin-bottom: 1rem;
   border-width: 0 0 1px;
