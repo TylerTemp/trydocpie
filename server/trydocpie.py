@@ -13,7 +13,9 @@ import shlex
 import sys
 import os
 import re
+import textwrap
 # import inspect
+import html
 try:
     from io import StringIO
 except ImportError:
@@ -146,6 +148,7 @@ def gen_folder(folder):
             'target': os.path.join(project_root, 'build', 'static', 'docpie-wiki'),
         },
     )
+    fenced_code_re = re.compile(r'(?P<indent>\s*)```(?P<lang>[\w\ \-_]*)(?P<content>.*?)```', re.DOTALL)
     for config in configs:
         source_folder = config['source']
         target_folder = config['target']
@@ -154,6 +157,7 @@ def gen_folder(folder):
 
         _dirpath, _dirnames, filenames = next(os.walk(source_folder))
         for filename in filenames:
+            print('processing {}'.format(filename))
             filebase, fileext = os.path.splitext(filename)
             fileext_lower = fileext.lower()
             if fileext_lower == '.md':
@@ -163,7 +167,41 @@ def gen_folder(folder):
             else:
                 continue
             with open(os.path.join(source_folder, filename), 'r', encoding='utf-8') as f:
-                content = f.read()
+                content_raw = f.read()
+
+            if '```' in content_raw:
+#                 middle_parts = []
+#                 content_parts = content_raw.split('```')
+#                 # first_part = content_parts.pop(0)
+#                 last_part = content_parts.pop(-1)
+#                 for content, codepart in zip(content_parts[::2], content_parts[1::2]):
+#                     middle_parts.append(content)
+#
+#                     print(codepart)
+#                     code_parts = codepart.splitlines()
+#                     language = code_parts.pop(0)
+#                     code_rejoined = textwrap.dedent('\n'.join(code_parts)).replace('\n','<br />').rstrip()
+#
+#                     middle_parts.append("""
+# <div class="codehilite">
+#     <pre class="language-{lang}"><code>{content}</code></pre>
+# </div>
+# """.format(lang=language, content=code_rejoined)
+#                    )
+#               content = '\n'.join(middle_parts) + last_part
+                content = fenced_code_re.sub(lambda matchobj: """
+{indent}<div class="codehilite"><pre class="language-{lang}"><code>{content}</code></pre></div>
+                """.format(
+                        lang=matchobj.groupdict()['lang'],
+                        indent=matchobj.groupdict()['indent'].replace('\n', ''),
+                        content=html.escape(textwrap.dedent(matchobj.groupdict()['content']).rstrip())[1:]
+                    ).replace('\n', '<br />'),
+                    content_raw
+                )
+                # print(content)
+                # assert False
+            else:
+                content = content_raw
 
             if filetype == 'md':
                 if filebase == 'Usage-Format':
@@ -171,12 +209,13 @@ def gen_folder(folder):
                     content_body = content.split('\n\n', 1)[1].replace('\\<argument\\>', '&lt;argument&gt;')
                     content = '[TOC]\n\n' + content_body
 
-                html = markdown.markdown(content, extensions=[
+                html_content = markdown.markdown(content, extensions=[
                     'markdown.extensions.fenced_code',
                     'markdown.extensions.footnotes',
                     'markdown.extensions.codehilite',
                     'markdown.extensions.toc',
                 ])
+                # html_content = content
                 # html = markdown2.markdown(content, extras=[
                 #     'toc',
                 #     'fenced-code-blocks',
@@ -185,11 +224,11 @@ def gen_folder(folder):
             elif filetype == 'rst':
                 html_fragment_writer = Writer()
                 html_fragment_writer.translator_class = HTMLFragmentTranslator
-                html = core.publish_string(content, writer=html_fragment_writer).decode('utf-8')
+                html_content = core.publish_string(content, writer=html_fragment_writer).decode('utf-8')
             if filebase in ('Home', '_Sidebar'):
-                html = re.sub('\\[\\[(.*?)\\]\\]', lambda matchobj: '<a href="/document/{link}">{linkname}</a>'.format(link=matchobj.group(1).replace(' ', '-'), linkname=matchobj.group(1)), html)
+                html_content = re.sub('\\[\\[(.*?)\\]\\]', lambda matchobj: '<a href="/document/{link}">{linkname}</a>'.format(link=matchobj.group(1).replace(' ', '-'), linkname=matchobj.group(1)), html_content)
 
-            soup = BeautifulSoup(html, 'html5lib')
+            soup = BeautifulSoup(html_content, 'html5lib')
             for link in soup.find_all('a'):
                 href = link.get('href')
                 if href and (href.startswith('http://') or href.startswith('https://')):
@@ -199,6 +238,7 @@ def gen_folder(folder):
                         link['href'] = url
 
             for pre in soup.find_all('pre'):
+                # break
                 inner_pre = pre.decode_contents()
                 pre_class = pre.get('class') or []
                 inner_break = inner_pre.replace('\n', '<br />')
