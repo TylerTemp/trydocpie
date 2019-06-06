@@ -148,7 +148,7 @@ def gen_folder(folder):
             'target': os.path.join(project_root, 'build', 'static', 'docpie-wiki'),
         },
     )
-    fenced_code_re = re.compile(r'(?P<indent>\s*)```(?P<lang>[\w\ \-_]*)(?P<content>.*?)```', re.DOTALL)
+    fenced_code_re = re.compile(r'(?P<indent>\s+)```(?P<lang>[\w\ \-_]*)(?P<content>.*?)\ +```', re.DOTALL)
     for config in configs:
         source_folder = config['source']
         target_folder = config['target']
