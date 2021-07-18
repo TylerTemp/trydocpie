@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack --progress --colors --mode=production & webpack-dev-server --progress --colors --mode=development --inline --port 8081",
     "build": "webpack --progress --colors --mode=production",
-    "serverinit": "cd server && pip install -U -e .; cd ..; python -m trydocpie gen build/static",
+    "servergen": "python -m trydocpie gen",
+    "serverinit": "cd server && pip install -U -e .; cd ..; python -m trydocpie gen",
     "server": "python -m trydocpie web"
   },
   "keywords": [

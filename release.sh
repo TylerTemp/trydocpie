@@ -1,4 +1,5 @@
 yarn build
+yarn servergen
 ssh "docpie.comes.today" 'mkdir -p release/trydocpieclient'
 ssh "docpie.comes.today" 'mkdir -p release/trydocpieserver'
 rsync --progress -r build/ "docpie.comes.today:release/trydocpieclient/"

@@ -3,7 +3,7 @@
 """
 Usage:
     trydocpie web [<port>]
-    trydocpie gen <folder>
+    trydocpie gen
 """
 
 import logging
@@ -135,7 +135,7 @@ class HTMLFragmentTranslator( HTMLTranslator ):
         return ''.join(self.body)
 
 
-def gen_folder(folder):
+def gen_folder():
     project_root = os.path.normpath(os.path.join(__file__, '..', '..'))
     codebase = os.path.join(project_root, 'server', 'codebase')
     configs = (
@@ -262,5 +262,5 @@ if __name__ == '__main__':
         port = int(args_port) if args_port is not None else 8080
         app.run(debug=False, port=port)
     elif args['gen']:
-        folder = args['<folder>']
-        gen_folder(folder)
+        # folder = args['<folder>']
+        gen_folder()

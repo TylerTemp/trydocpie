@@ -3,8 +3,10 @@
 ## Start ##
 
 ```bash
+git submodule init
+git submodule update
 yarn install
-yarn serverinstall
+yarn serverinit
 ```
 
 gen css (optional)
@@ -36,6 +38,6 @@ pre > code {
 ```
 
 *   start: `yarn start`
-*   build: `yarn build`
+*   build: `yarn servergen; yarn build`
 *   lint fix: `./lint.sh` and `./lint.sh --fix`
 *   release: `./release.sh <host>`
