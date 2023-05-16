@@ -19,6 +19,7 @@ setup(
     #         ],
     # },
     version=__version__,
+    py_modules=[],
     install_requires=[
         'flask',
         'docpie',

@@ -40,4 +40,4 @@ pre > code {
 *   start: `yarn start`
 *   build: `yarn servergen; yarn build`
 *   lint fix: `./lint.sh` and `./lint.sh --fix`
-*   release: `./release.sh <host>`
+*   release: `./release.sh`

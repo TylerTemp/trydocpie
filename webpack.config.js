@@ -43,7 +43,7 @@ module.exports = {
     new ManifestPlugin(),
     new WebpackShellPlugin({
       onBuildStart:[],
-      onBuildEnd:['python -m trydocpie gen build/static']
+      onBuildEnd:['python -m trydocpie gen']
     }),
     new CopyPlugin([
       { from: 'public/code-highlight.css', to: 'code-highlight.css' },
