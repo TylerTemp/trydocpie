@@ -11,3 +11,6 @@ __pycache__
 !.gitmodules
 !.eslintrc.js
 !.babelrc
+
+/server/Pipfile
+/server/Pipfile.lock

@@ -1,0 +1,48 @@
+.topbar {
+    background-color: #0e90d2;
+    border-color: #0b6fa2;
+    color: #eee;
+    position: sticky;
+    top: 0;
+    min-height: 50px;
+    margin-bottom: 1rem;
+    border-width: 0 0 1px;
+    border-style: solid;
+    z-index: 100;
+}
+
+.nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: stretch;
+}
+
+.navLink {
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navLink:hover {
+    background: #ddd;
+    /* color: black; */
+    background-color: rgba(0,0,0,.05);
+}
+
+.navLink.active {
+    background-color: rgba(0,0,0,.1);
+}
+
+.centerContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.widthLimit {
+    width: 100%;
+    max-width: 1100px;
+}
