@@ -151,17 +151,66 @@
     margin-top: 1em;
 }
 
+.optionRows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.optionRow {
+    width: 100%;
+}
+
 .optionLabel {
     display: inline-block;
-    width: 30vw;
+    width: 30%;
     border-bottom: 1px dashed #bdbcbc;
 }
 
 .optionValueContainer {
-    display: inline;
-    width: 70vw;
+    display: inline-block;
+    width: 70%;
 }
 
 .optionDeleted {
     text-decoration: line-through;
+}
+
+.argsLine {
+    line-height: 1.5em;
+    min-height: 3em;
+}
+
+
+/* https://css-tricks.com/the-cleanest-trick-for-autogrowing-textareas/ */
+.growWrap {
+    /* easy way to plop the elements on top of each other and have them both sized based on the tallest one's height */
+    display: grid;
+}
+.growWrap::after {
+    /* Note the weird space! Needed to preventy jumpy behavior */
+    content: attr(data-replicated-value) " ";
+
+    /* This is how textarea text behaves */
+    white-space: pre-wrap;
+
+    /* Hidden from view, clicks, and screen readers */
+    visibility: hidden;
+}
+.growWrap > textarea {
+    /* You could leave this, but after a user resizes, then it ruins the auto sizing */
+    resize: none;
+
+    /* Firefox shows scrollbar on growth, you can hide like this. */
+    overflow: hidden;
+}
+.growWrap > textarea,
+.growWrap::after {
+    /* Identical styling required!! */
+    border: 1px dotted white;
+    /* padding: 0.5rem; */
+    font: inherit;
+
+    /* Place on top of each other */
+    grid-area: 1 / 1 / 2 / 2;
 }

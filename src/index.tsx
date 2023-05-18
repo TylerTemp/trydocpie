@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Routes, Route } from 'react-router-dom';
 import ErrorBoundary from "~/Components/ErrorBoundary";
 
+import Home from '~/Pages/Home';
 import TryDocpie from "~/Pages/TryDocpie";
 import NotFound from "~/Pages/NotFound";
 import Layout from "~/Components/Layout";
@@ -13,6 +14,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<Erro
         <Router>
             <Routes>
                 <Route path="/" element={<Layout />}>
+                    <Route index element={<Home />} />
                     <Route path="try" element={<TryDocpie />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>

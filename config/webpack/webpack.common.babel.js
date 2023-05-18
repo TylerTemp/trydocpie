@@ -12,6 +12,16 @@ module.exports = () => ({
     module: {
         rules: [
             {
+                test: /\.html$/i,
+                exclude: {
+                    or: [
+                        /node_modules/,
+                        path.join(paths.root, 'src', 'index.html'),
+                    ],
+                },
+                loader: "html-loader",
+            },
+            {
                 test: /\.css/,
                 use: [
                     { loader: 'style-loader' },
