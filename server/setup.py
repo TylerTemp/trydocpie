@@ -28,6 +28,7 @@ setup(
         'bs4',
         'html5lib',
         'pygments',
+        'waitress',
     ],
     author="TylerTemp",
     author_email="tylertempdev@gmail.com",

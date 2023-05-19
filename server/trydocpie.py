@@ -2,8 +2,12 @@
 #-*- coding: utf-8 -*-
 """
 Usage:
-    trydocpie web [<port>]
+    trydocpie web [<port>] [--hot]
     trydocpie gen
+
+Options:
+    --hot                   hot reload
+    -b, --bind=<host>       bind host [default: 127.0.0.1]
 """
 
 import logging
@@ -70,49 +74,62 @@ class StdoutRedirect(StringIO):
 def trydocpie(doc, argv, *a, **k):
 
     with StdoutRedirect() as stdout:
-        error = False
+        ok = True
         try:
             pie = docpie.docpie(doc, argv, *a, **k)
         except (docpie.DocpieExit, SystemExit) as e:
-            error = True
-            output = str(e)
+            # error = True
+            # output = str(e)
+            error = str(e)
+            if not error.strip():
+                error = stdout.getvalue()
+
+            return {
+                'status': 'exit',
+                'output': error,
+                'result': None,
+            }
         else:
-            output = str(pie)
+            # output = str(pie)
+            # return False, dict(pie)
+            return {
+                'status': 'pie',
+                'output': None,
+                'result': dict(pie),
+            }
 
-        if not output.strip():
-            output = stdout.getvalue()
+    #     if not output.strip():
+    #         output = stdout.getvalue()
 
-    return error, output
+    # return error, output
 
 
 @app.route('/', methods=('POST',))
 def trydocpiehandler():
     body = flask.request.get_data().decode('utf-8')
     args = json.loads(body)
+
+    args.pop('extra', None)
+    args.pop('case_sensetive', None)
+
     argvstr = args.pop('argvnofilestr')
+
     argv = shlex.split('pie.py ' + argvstr)
     args['argv'] = argv
+    print(args)
     unexpected_error = False
+    status = 200
     try:
-        expected_error, output = trydocpie(**args)
+        result = trydocpie(**args)
     except BaseException as e:
         logger.error(e, exc_info=True)
         unexpected_error = True
-        output = '{}: {}'.format(e.__class__.__name__, (e.args[0] if e.args else '') or '')
-
-    if unexpected_error:
-        code = 500
-        resp = {
-            'message': output
+        result = {
+            'message': '{}: {}'.format(e.__class__.__name__, (e.args[0] if e.args else '') or ''),
         }
-    else:
-        code = 200
-        resp = {
-            'ok': (not expected_error),
-            'result': output
-        }
+        status = 500
 
-    return flask.Response(json.dumps(resp), status=code, mimetype='application/json')
+    return flask.Response(json.dumps(result), status=status, mimetype='application/json')
 
 
 @app.route('/', methods=('GET',))
@@ -254,13 +271,18 @@ def gen_folder():
 
 
 if __name__ == '__main__':
+    import waitress
+
     args = docpie.docpie(__doc__)
     logging.basicConfig()
     logger.setLevel(logging.DEBUG)
     if args['web']:
         args_port = args['<port>']
         port = int(args_port) if args_port is not None else 8080
-        app.run(debug=False, port=port)
+        if(args['--hot']):
+            app.run(debug=True, port=port)
+        else:
+            waitress.serve(app, host=args['--bind'], port=args_port)
     elif args['gen']:
         # folder = args['<folder>']
         gen_folder()

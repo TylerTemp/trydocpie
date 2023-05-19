@@ -22,6 +22,7 @@
     "@types/react-dom": "^18.2.4",
     "babel-loader": "^9.1.2",
     "babel-plugin-root-import": "^6.6.0",
+    "clean-webpack-plugin": "^4.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.3",
     "html-loader": "^4.2.0",
@@ -33,6 +34,7 @@
     "webpack": "^5.82.1",
     "webpack-cli": "^5.1.1",
     "webpack-dev-server": "^4.15.0",
+    "webpack-manifest-plugin": "^5.0.0",
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {

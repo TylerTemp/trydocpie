@@ -19,7 +19,8 @@ export default () => (
     <header className={classNames(layoutStyle.centerContainer, layoutStyle.topbar)}>
       <nav className={classNames(layoutStyle.widthLimit, layoutStyle.nav)}>
         <NavLink to="/" className={NavLinkClass}>Home</NavLink>
-        <NavLink to="/document" className={NavLinkClass}>Document</NavLink>
+        {/* <NavLink to="/document" className={NavLinkClass}>Document</NavLink> */}
+        <a href="https://github.com/TylerTemp/docpie/wiki" target='_blank' className={layoutStyle.navLink}>Document</a>
         <NavLink to="/try" className={NavLinkClass}>Try Online</NavLink>
       </nav>
     </header>

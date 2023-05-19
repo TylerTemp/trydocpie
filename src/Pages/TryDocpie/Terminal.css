@@ -67,7 +67,7 @@
 .terminalContainer {
     background-color: #610B4B;
     color: #fff;
-    padding: 5px;
+
     padding: 10px;
     margin-top: 10px;
 
@@ -80,7 +80,20 @@
     flex-direction: row;
     flex-wrap: wrap;
     /* align-items: baseline; */
-    align-items: flex-start;
+    /* align-items: flex-start; */
+    /* justify-content: center; */
+    align-items: stretch;
+    gap: 10px;
+
+    height: 30px;
+}
+
+.execPrefix {
+    white-space: nowrap;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .terminalInput {
@@ -91,12 +104,14 @@
     font-weight: bold;
     padding-left: 5px;
     padding-right: 5px;
+
+    /* box-shadow: 0 0 5px rgba(81, 203, 238, 1); */
+    border-bottom: #80d4ff8f solid 1px;
 }
 
-.terminalInput:focus {
+/* .terminalInput:focus {
     box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-    /* border: 1px solid rgba(81, 203, 238, 0.59); */
-}
+} */
 
 .terminalEnter {
     padding: 0 2px 0 2px;
@@ -110,12 +125,62 @@
     border: 1px solid rgba(255, 255, 255, 0.59); */
 }
 
-.execPrefix {
-    white-space: nowrap;
-}
-
 .dollar {
     color: #F3F781;
+}
+
+.separatorTexted {
+    width: 100%;
+
+
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+    margin: 16px 0;
+    white-space: nowrap;
+    text-align: center;
+    /* border-block-start: 0 rgba(255, 255, 255, 0.45); */
+
+    background: none;
+    border-color: rgba(255, 255, 255, 0.45);
+    /* border-color: rgba(255, 255, 255, 0.45);
+    border-style: dashed;
+    border-width: 1px 0 0; */
+    clear: both;
+    min-width: 100%;
+
+    box-sizing: border-box;
+    padding: 0;
+    /* line-height: 1.5714285714285714; */
+    list-style: none;
+}
+
+.spearatorContent {
+    padding: 0 10px;
+}
+
+.separatorTexted::before {
+    border-style: dashed none none;
+    position: relative;
+    width: 50%;
+    border-block-start: 1px dashed transparent;
+    border-block-start-color: transparent;
+    border-block-start-color: inherit;
+    border-block-end: 0;
+    transform: translateY(50%);
+    content: '';
+}
+
+.separatorTexted::after {
+    border-style: dashed none none;
+    position: relative;
+    width: 50%;
+    border-block-start: 1px dashed transparent;
+    border-block-start-color: transparent;
+    border-block-start-color: inherit;
+    border-block-end: 0;
+    transform: translateY(50%);
+    content: '';
 }
 
 .apiResult {
@@ -124,6 +189,7 @@
 }
 
 .apiApiError {
+    margin-top: 20px;
     color: yellow;
 }
 
@@ -186,6 +252,9 @@
 .growWrap {
     /* easy way to plop the elements on top of each other and have them both sized based on the tallest one's height */
     display: grid;
+
+    /* padding: 2rem 0; */
+    margin: 0.3rem 0;
 }
 .growWrap::after {
     /* Note the weird space! Needed to preventy jumpy behavior */

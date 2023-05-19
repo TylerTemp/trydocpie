@@ -2,6 +2,10 @@ import { createRef, useEffect, useRef, useState } from 'react';
 // import Suspendable from '~/Utils/Suspendable';
 import Style from './Terminal.css';
 import classNames from 'classnames';
+import Request from '~/Utils/Request';
+import DoubleDotsSpinner from '~/Components/DoubleDotsSpinner';
+import { useNavigate } from 'react-router-dom';
+import queryString from 'query-string';
 
 
 export interface Params {
@@ -18,7 +22,8 @@ export interface Params {
     optionsfirst: boolean,
     appearedonly: boolean,
     namedoptions: boolean,
-    run: boolean,
+    onSubmitCallback: (curParams: Params) => void,
+    // run: boolean,
 }
 
 // const getData: () => string = Suspendable(new Promise<string>((resolve) => {
@@ -28,29 +33,75 @@ export interface Params {
 //     }, 2000);
 // }));
 
+interface ApiResult {
+  status: 'exit' | 'pie',
+  output: string | null,
+  result: object | null,
+}
+
 export default (params: Params) => {
     const [
-        {
-            doc,
-            argvnofilestr,
-            help,
-            version,
-            stdopt,
-            attachopt,
-            attachvalue,
-            helpstyle,
-            auto2dashes,
-            name,
-            optionsfirst,
-            appearedonly,
-            namedoptions,
-            run,
-        },
-        setParams
+      curParams,
+      setParams
     ] = useState<Params>(params);
 
+    const {
+      doc,
+      argvnofilestr,
+      help,
+      version,
+      stdopt,
+      attachopt,
+      attachvalue,
+      helpstyle,
+      auto2dashes,
+      name,
+      optionsfirst,
+      appearedonly,
+      namedoptions,
+      onSubmitCallback,
+    } = curParams;
+
+    // const navigate = useNavigate();
+
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<Error | null>(null);
+    const [apiResult, setApiResult] = useState<ApiResult | null>(null);
+    const [abortController, setAbortController] = useState<AbortController>(new AbortController());
+    useEffect(() => () => abortController.abort(), []);
+
+    const onSubmit = (evt: React.FormEvent<HTMLFormElement>): void => {
+      evt.preventDefault();
+      console.log('Submit:', curParams);
+
+      const newController = new AbortController();
+      setAbortController(oldController => {
+          oldController.abort();
+          return newController;
+      });
+
+      setLoading(true);
+      setError(null);
+      setApiResult(null);
+
+      onSubmitCallback(curParams);
+
+      Request(`/`, {method: 'POST', body: JSON.stringify(curParams), signal: newController.signal})
+        .then(resp => resp.json())
+        .then((resp: ApiResult): void => setApiResult(resp))
+        .catch(err => {
+          if(err instanceof DOMException && err.name === 'AbortError') {
+            return;
+          }
+          setError(err);
+        })
+        .finally(() => setLoading(false));
+    };
+
+    // console.log('apiResult', apiResult);
+
     return <div className={Style.container}>
-    <form onSubmit={console.log}>
+    <form onSubmit={onSubmit}>
       <div className={classNames(Style.editor, Style.monospace)}>
         <span className={Style.comment}>#!/usr/bin/env python</span>
         <br />
@@ -110,25 +161,48 @@ export default (params: Params) => {
       <div className={classNames(Style.terminalContainer!, Style.monospace!)}>
         <div className={Style.terminal}>
           <label className={Style.execPrefix!} htmlFor="argvnofilestr">
-            <span className={Style.dollar}>$</span>
-            {' '}
-            python
-            {' '}
-            <span>{name || `pie.py`}</span>
-            {' '}
+            <span>
+              <span className={Style.dollar}>$</span>
+              {' '}
+              python
+              {' '}
+              <span>{name || `pie.py`}</span>
+              {' '}
+            </span>
           </label>
-          <input className={Style.terminalInput} type="text" id="argvnofilestr" value={argvnofilestr} name="argvnofilestr" placeholder="# Input your argv" onChange={console.log} />
+          <input className={Style.terminalInput} type="text" id="argvnofilestr" value={argvnofilestr} name="argvnofilestr" placeholder="# Input your argv" onChange={({currentTarget: {name, value}}: React.ChangeEvent<HTMLInputElement>) => setParams(old => ({...old, [name]: value}))} />
           <button type="submit" className={Style.terminalEnter} aria-label="Enter">&#9166;</button>
         </div>
+        {/* terminal loading */}
+        {loading && <div className={Style.separatorTexted!}>
+          <span className={Style.spearatorContent!}>
+            <span>Loading</span> <DoubleDotsSpinner size={20} style={{display: 'inline-block'}}/>
+          </span>
+        </div>}
         {/* terminal result */}
-        {/* <div className={classNames({[Style['api-error']]: apiError, [Style['api-result']]: true, [Style['monospace']]: true})}>{result}</div> */}
+        {
+          apiResult !== null
+          && <>
+            <div className={Style.separatorTexted!}>
+              <span className={Style.spearatorContent!}>{
+                apiResult.status === 'pie'? "Result": "DocpieExit"
+              }</span>
+            </div>
+            <div className={classNames({
+                [Style.apiError]: apiResult.status === 'exit',
+                [Style.apiResult]: true,
+                [Style.monospace]: true
+              })}>{apiResult.status === 'exit'? apiResult.output: JSON.stringify(apiResult.result, null, 2)}</div>
+          </>
+        }
       </div>
 
-      {/* <div className={Style['server-error-wapper']}>
-        <div className={Style['server-error']}>
-          <pre>{serverError}</pre>
+      {error && <div className={Style.serverErrorWapper!}>
+          <div className={Style.serverError!}>
+            <pre>{error.message}</pre>
+          </div>
         </div>
-      </div> */}
+      }
 
       <hr />
 

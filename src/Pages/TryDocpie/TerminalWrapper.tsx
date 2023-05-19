@@ -1,9 +1,10 @@
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import queryString from 'query-string';
 
 import Terminal, {Params as TerminalParams} from './Terminal';
+import { useState } from "react";
 
-const defaultDoc: string = "Naval Fate.\n\nUsage:\n  naval_fate ship new <name>...\n  naval_fate ship <name> move <x> <y> [--speed=<km/h>]\n  naval_fate ship shoot <x> <y>\n  naval_fate mine (set|remove) <x> <y> [--moored|--drifting]\n  naval_fate -h | --help\n  naval_fate --version\n\nOptions:\n  -h -? --help    Show this screen.\n  --version       Show version.\n  --speed=<km/h>  Speed in knots.[default: 10]\n  --moored        Moored (anchored) mine.\n  --drifting      Drifting mine.";
+const defaultDoc: string = "Naval Fate.\n\nUsage:\n  naval_fate ship new <name>...\n  naval_fate ship <name> move <x> <y> [--speed=<km/h>]\n  naval_fate ship shoot <x> <y>\n  naval_fate mine (set|remove) <x> <y> [--moored|--drifting]\n  naval_fate -h | --help\n  naval_fate --version\n\nOptions:\n  -h -? --help    Show this screen.\n  --version       Show version.\n  --speed=<km/h>  Speed in knots.[default: 10]\n  --moored        Moored (anchored) mine.\n  --drifting      Drifting mine.\n";
 
 interface QueryParams {
     doc?: string,
@@ -19,14 +20,62 @@ interface QueryParams {
     optionsfirst?: string,
     appearedonly?: string,
     namedoptions?: string,
-    run?: string,
+    // run?: string,
+}
+
+type ValueType = string | number | boolean | null | undefined;
+
+// interface Struct {
+//     [key: string]: ValueType;
+// }
+
+const queryStringify = (curParams: TerminalParams): string => {
+    const queryParams = [];
+
+    for (const key in curParams) {
+        if (curParams.hasOwnProperty(key)) {
+            const value: ValueType = curParams[key as keyof TerminalParams] as ValueType;
+
+            if (value !== null && value !== false && value !== undefined)
+            {
+                const valueInitConvert = value === true
+                    ? '1'
+                    : value.toString();
+                queryParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(valueInitConvert)}`);
+            }
+      }
+    }
+
+    return queryParams.join('&');
 }
 
 export default () => {
     const {search=''} = useLocation();
+
+    const [prevSearch, setPrevSearch] = useState<string>(search);
+    const [pageChanged, onPageChange] = useState<number>(-1);
+    const navigate = useNavigate();
+
+    const onSubmitCallback = (curParams: TerminalParams) => {
+        const newQuery = `?${queryStringify(curParams)}`;
+        setPrevSearch(newQuery);
+        navigate(newQuery);
+    }
+
+    let pageKey = pageChanged;
+    if(prevSearch !== search) {
+        pageKey = -pageKey;
+        onPageChange(pageKey);
+        setPrevSearch(search);
+        console.log(`flip page`);
+        // return <></>;
+    }
+
     const queryParams: QueryParams = queryString.parse(search);
-    const pageParams: TerminalParams = {
-        doc: queryParams.doc? queryParams.doc as string: defaultDoc,
+    const hasQueryParams = Object.keys(queryParams).length > 0;
+    const pageParams: TerminalParams = hasQueryParams
+    ? {
+        doc: queryParams.doc! as string,
         argvnofilestr: queryParams.argvnofilestr || '',
         help: queryParams.help !== undefined,
         version: queryParams.version === undefined? null: queryParams.version as string,
@@ -39,7 +88,27 @@ export default () => {
         optionsfirst: queryParams.optionsfirst !== undefined,
         appearedonly: queryParams.appearedonly !== undefined,
         namedoptions: queryParams.namedoptions !== undefined,
-        run: queryParams.run !== undefined
+
+        onSubmitCallback,
+        // run: queryParams.run !== undefined
     }
-    return <Terminal {...pageParams} key={search} />;
+    : {
+        doc: defaultDoc,
+        argvnofilestr: '',
+        help: true,
+        version: null,
+        stdopt: true,
+        attachopt: true,
+        attachvalue: true,
+        helpstyle: 'python',
+        auto2dashes: true,
+        name: null,
+        optionsfirst: false,
+        appearedonly: false,
+        namedoptions: false,
+
+        onSubmitCallback,
+        // run: false,
+    }
+    return <Terminal {...pageParams} key={pageKey}/>;
 }
