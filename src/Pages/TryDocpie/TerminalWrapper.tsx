@@ -3,6 +3,7 @@ import queryString from 'query-string';
 
 import Terminal, {Params as TerminalParams} from './Terminal';
 import { useState } from "react";
+import ReplaceAll from "~/Utils/ReplaceAll";
 
 const defaultDoc: string = "Naval Fate.\n\nUsage:\n  naval_fate ship new <name>...\n  naval_fate ship <name> move <x> <y> [--speed=<km/h>]\n  naval_fate ship shoot <x> <y>\n  naval_fate mine (set|remove) <x> <y> [--moored|--drifting]\n  naval_fate -h | --help\n  naval_fate --version\n\nOptions:\n  -h -? --help    Show this screen.\n  --version       Show version.\n  --speed=<km/h>  Speed in knots.[default: 10]\n  --moored        Moored (anchored) mine.\n  --drifting      Drifting mine.\n";
 
@@ -20,6 +21,8 @@ interface QueryParams {
     optionsfirst?: string,
     appearedonly?: string,
     namedoptions?: string,
+
+    replace?: boolean,
     // run?: string,
 }
 
@@ -49,6 +52,19 @@ const queryStringify = (curParams: TerminalParams): string => {
     return queryParams.join('&');
 }
 
+const ReplaceN = (doc: string, replace: boolean) => {
+    if(!replace) {
+        return doc;
+    }
+
+    // console.log(`replace \\n for ${doc}`);
+    // const result = doc.replaceAll('\\n', '\n');;
+    // console.log(result);
+    // return result;
+    // return doc.replace('\\n', '\n');
+    return ReplaceAll(doc, '\\n', '\n');
+}
+
 export default () => {
     const {search=''} = useLocation();
 
@@ -73,9 +89,11 @@ export default () => {
 
     const queryParams: QueryParams = queryString.parse(search);
     const hasQueryParams = Object.keys(queryParams).length > 0;
+    const replaceN = queryParams.replace !== undefined;
+    // console.log(`replaceN=${replaceN}`)
     const pageParams: TerminalParams = hasQueryParams
     ? {
-        doc: queryParams.doc! as string,
+        doc: ReplaceN(queryParams.doc! as string, replaceN),
         argvnofilestr: queryParams.argvnofilestr || '',
         help: queryParams.help !== undefined,
         version: queryParams.version === undefined? null: queryParams.version as string,
